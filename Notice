@@ -1,0 +1,268 @@
+import java.awt.*;
+import java.awt.event.*;
+import java.util.HashMap;
+
+class Notice {
+    private String message;
+    private String venue;
+    private String time;
+    private String qualification;
+
+    public Notice(String message, String venue, String time, String qualification) {
+        this.message = message;
+        this.venue = venue;
+        this.time = time;
+        this.qualification = qualification;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getVenue() {
+        return venue;
+    }
+
+    public void setVenue(String venue) {
+        this.venue = venue;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getQualification() {
+        return qualification;
+    }
+
+    public void setQualification(String qualification) {
+        this.qualification = qualification;
+    }
+
+    @Override
+    public String toString() {
+        return "Message: " + message + ", Venue: " + venue + ", Time: " + time + ", Qualification: " + qualification;
+    }
+}
+
+public class NoticeBoardSystemAWT extends Frame {
+    private HashMap<Integer, Notice> notices = new HashMap<>();
+    private int noticeIdCounter = 1;
+    private TextArea displayArea;
+    private TextField idField, messageField, venueField, timeField, qualificationField;
+    private Label messageLabel;
+
+    public NoticeBoardSystemAWT() {
+        // Layout and Title
+        setLayout(new FlowLayout());
+        Label title = new Label("Notice Board System");
+        title.setFont(new Font("Arial", Font.BOLD, 16));
+        add(title);
+
+        // Input Fields
+        add(new Label("ID:"));
+        idField = new TextField(5);
+        add(idField);
+
+        add(new Label("Message:"));
+        messageField = new TextField(15);
+        add(messageField);
+
+        add(new Label("Venue:"));
+        venueField = new TextField(15);
+        add(venueField);
+
+        add(new Label("Time:"));
+        timeField = new TextField(10);
+        add(timeField);
+
+        add(new Label("Qualification:"));
+        qualificationField = new TextField(15);
+        add(qualificationField);
+
+        // Buttons
+        Button addButton = new Button("Add Notice");
+        Button updateButton = new Button("Update Notice");
+        Button deleteButton = new Button("Delete Notice");
+        Button displayButton = new Button("Display Notices");
+        Button exitButton = new Button("Exit");
+
+        add(addButton);
+        add(updateButton);
+        add(deleteButton);
+        add(displayButton);
+        add(exitButton);
+
+        // Display Area
+        displayArea = new TextArea(10, 50);
+        displayArea.setEditable(false);
+        add(displayArea);
+
+        // Message Label
+        messageLabel = new Label(" ");
+        messageLabel.setForeground(Color.RED);
+        add(messageLabel);
+
+        // Button Actions
+        addButton.addActionListener(e -> addNotice());
+        updateButton.addActionListener(e -> updateNotice());
+        deleteButton.addActionListener(e -> deleteNotice());
+        displayButton.addActionListener(e -> displayNotices());
+        exitButton.addActionListener(e -> System.exit(0));
+
+        // Frame Settings
+        setSize(600, 400);
+        setTitle("Notice Board System");
+        setVisible(true);
+
+        // Close Window Action
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                System.exit(0);
+            }
+        });
+    }
+
+    private void addNotice() {
+        try {
+            String message = messageField.getText();
+            String venue = venueField.getText();
+            String time = timeField.getText();
+            String qualification = qualificationField.getText();
+
+            if (message.isEmpty() || venue.isEmpty() || time.isEmpty() || qualification.isEmpty()) {
+                messageLabel.setText("Error: All fields are required!");
+                return;
+            }
+
+            notices.put(noticeIdCounter++, new Notice(message, venue, time, qualification));
+            messageLabel.setText("Notice added successfully!");
+            clearFields();
+        } catch (Exception ex) {
+            messageLabel.setText("Error: Invalid input!");
+        }
+    }
+
+    private void updateNotice() {
+        try {
+            int id = Integer.parseInt(idField.getText());
+            if (!notices.containsKey(id)) {
+                messageLabel.setText("Notice not found!");
+                return;
+            }
+
+            Notice notice = notices.get(id);
+            notice.setMessage(messageField.getText());
+            notice.setVenue(venueField.getText());
+            notice.setTime(timeField.getText());
+            notice.setQualification(qualificationField.getText());
+
+            messageLabel.setText("Notice updated successfully!");
+            clearFields();
+        } catch (Exception ex) {
+            messageLabel.setText("Error: Invalid input!");
+        }
+    }
+
+    private void deleteNotice() {
+        try {
+            int id = Integer.parseInt(idField.getText());
+            if (notices.remove(id) != null) {
+                messageLabel.setText("Notice deleted successfully!");
+            } else {
+                messageLabel.setText("Notice not found!");
+            }
+            clearFields();
+        } catch (Exception ex) {
+            messageLabel.setText("Error: Invalid input!");
+        }
+    }
+
+    private void displayNotices() {
+        if (notices.isEmpty()) {
+            displayArea.setText("No notices available.");
+        } else {
+            StringBuilder builder = new StringBuilder();
+            notices.forEach((id, notice) -> builder.append("ID: ").append(id).append(", ").append(notice).append("\n"));
+            displayArea.setText(builder.toString());
+        }
+    }
+
+    private void clearFields() {
+        idField.setText("");
+        messageField.setText("");
+        venueField.setText("");
+        timeField.setText("");
+        qualificationField.setText("");
+    }
+
+    public static void main(String[] args) {
+        LoginFrame loginFrame = new LoginFrame();
+    }
+}
+
+class LoginFrame extends Frame {
+    private TextField usernameField, passwordField;
+    private Label messageLabel;
+
+    public LoginFrame() {
+        setLayout(new FlowLayout());
+        setTitle("Login");
+
+        // Username
+        add(new Label("Username:"));
+        usernameField = new TextField(15);
+        add(usernameField);
+
+        // Password
+        add(new Label("Password:"));
+        passwordField = new TextField(15);
+        passwordField.setEchoChar('*');
+        add(passwordField);
+
+        // Buttons
+        Button loginButton = new Button("Login");
+        Button exitButton = new Button("Exit");
+        add(loginButton);
+        add(exitButton);
+
+        // Message Label
+        messageLabel = new Label(" ");
+        messageLabel.setForeground(Color.RED);
+        add(messageLabel);
+
+        loginButton.addActionListener(e -> validateLogin());
+        exitButton.addActionListener(e -> System.exit(0));
+
+        setSize(300, 200);
+        setVisible(true);
+
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                System.exit(0);
+            }
+        });
+    }
+
+    private void validateLogin() {
+        String username = usernameField.getText();
+        String password = passwordField.getText();
+
+        // Simple authentication (hardcoded)
+        if ("admin".equals(username) && "password".equals(password)) {
+            messageLabel.setText("Login successful!");
+            dispose(); // Close the login window
+            new NoticeBoardSystemAWT(); // Open the Notice Board System
+        } else {
+            messageLabel.setText("Invalid credentials!");
+        }
+    }
+}
